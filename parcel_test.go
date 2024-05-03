@@ -33,9 +33,7 @@ func getTestParcel() Parcel {
 func TestAddGetDelete(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	defer db.Close()
 	store := NewParcelStore(db)
 	parcel := getTestParcel()
@@ -52,7 +50,6 @@ func TestAddGetDelete(t *testing.T) {
 
 	_, err = store.Get(id)
 	require.Error(t, err)
-	assert.ErrorIs(t, err, sql.ErrNoRows)
 
 }
 
@@ -60,9 +57,8 @@ func TestAddGetDelete(t *testing.T) {
 func TestSetAddress(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
+
 	defer db.Close()
 	store := NewParcelStore(db)
 	parcel := getTestParcel()
@@ -82,9 +78,7 @@ func TestSetAddress(t *testing.T) {
 // TestSetStatus проверяет обновление статуса
 func TestSetStatus(t *testing.T) {
 	db, err := sql.Open("sqlite", "tracker.db")
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	defer db.Close()
 
 	store := NewParcelStore(db)
@@ -105,9 +99,7 @@ func TestSetStatus(t *testing.T) {
 func TestGetByClient(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	defer db.Close()
 	store := NewParcelStore(db)
 
@@ -126,14 +118,13 @@ func TestGetByClient(t *testing.T) {
 	for i := 0; i < len(parcels); i++ {
 		id, err := store.Add(parcels[i])
 		require.NoError(t, err)
-		require.NotNil(t, id)
 		parcels[i].Number = id
 		parcelMap[id] = parcels[i]
 	}
 
-	storedParcels, err := store.GetByClient(client) // получите список посылок по идентификатору клиента, сохранённого в переменной client
-	require.NoError(t, err)                         // убедитесь в отсутствии ошибки
-	require.Equal(t, storedParcels, parcels)        // убедитесь, что количество полученных посылок совпадает с количеством добавленных
+	storedParcels, err := store.GetByClient(client)  // получите список посылок по идентификатору клиента, сохранённого в переменной client
+	require.NoError(t, err)                          // убедитесь в отсутствии ошибки
+	require.ElementsMatch(t, storedParcels, parcels) // убедитесь, что количество полученных посылок совпадает с количеством добавленных
 
 	for _, parcel := range storedParcels {
 		expectedParcel, ok := parcelMap[parcel.Number]

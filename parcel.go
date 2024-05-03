@@ -19,7 +19,7 @@ func (s ParcelStore) Add(p Parcel) (int, error) {
 		sql.Named("address", p.Address),
 		sql.Named("created_at", p.CreatedAt))
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
@@ -59,6 +59,10 @@ func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 		}
 
 		res = append(res, parcel)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
 	}
 
 	return res, nil
